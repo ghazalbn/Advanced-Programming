@@ -1,0 +1,67 @@
+{
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "g++.exe build active file",
+            "command": "C:\\VSCode\\MinGW\\bin\\g++.exe",
+            "args": [
+                "-std=c++17",
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+            ],
+            "options": {
+                "cwd": "C:\\VSCode\\MinGW\\bin"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "g++.exe compile active file",
+            "command": "C:\\VSCode\\MinGW\\bin\\g++.exe",
+            "args": [
+                "${file}",
+                "-c"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "type": "shell",
+            "label": "g++.exe build project",
+            "command": "C:\\VSCode\\MinGW\\bin\\g++.exe",
+            "args": [
+                "*.o",
+                "-o",
+                "${workspaceFolderBasename}.exe"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": "g++.exe compile active file"
+        },
+        {
+            "type": "shell",
+            "label": "g++.exe compile all files",
+            "command": "C:\\VSCode\\MinGW\\bin\\g++.exe",
+            "args": [
+                "*.c*",
+                "-c"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        }
+    ],
+    "version": "2.0.0"
+}

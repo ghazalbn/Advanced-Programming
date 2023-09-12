@@ -1,0 +1,26 @@
+@page "/MyChart"
+<div class="col-md-12 col-sm-12 p-4">
+    <RadzenChart>
+        <RadzenLineSeries Data="@Data" CategoryProperty="count" Title="positive/negative" ValueProperty="ratio">
+            <RadzenMarkers MarkerType="MarkerType.Circle" />
+        </RadzenLineSeries>
+        <RadzenCategoryAxis Padding="20" Formatter="@Format"/>
+        <RadzenValueAxis Formatter="@Format">
+            <RadzenGridLines Visible="true" />
+            <RadzenAxisTitle Text="The Ratio of Positive words to Negative words" />
+        </RadzenValueAxis>
+    </RadzenChart>
+</div>
+@code{
+    [Parameter]
+    public Words[] Data{get; set;} = new[]
+    {
+        new Words
+        {
+            count = 10,
+            ratio = Math.Round(((double)3/4), 3)
+        }
+    };
+    string Format(object value)
+        => Math.Round((double)value, 3).ToString();
+}

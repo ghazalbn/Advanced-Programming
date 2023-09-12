@@ -1,0 +1,41 @@
+@inject NavigationManager Nav 
+@inject HttpClient Http
+
+<div class="row" >
+    <a @onclick=@OnClick type="button" class="col-2 text-center">
+        <img class="teacher-thumb" src=@teacher.Img>
+    </a>
+    <div class="col-5">
+        <h6><a class="text-dark" @onclick=@OnClick type="button">@teacher.Name</a></h6>
+    </div>
+    <div class="col-2" style="margin-top: 20px;"><h6>@teacher.TotalRate%</h6></div>
+    <div class="col px-0">
+        <div class="star-ratings-sprite">
+            <span style="width:@teacher.TotalRate%" class="star-ratings-sprite-rating"></span>
+        </div>
+    </div>
+</div>
+<hr>
+
+@code{
+    [Parameter]
+    public Teacher teacher {get; set;}
+    private Action OnClick => () => Nav.NavigateTo ($"/{teacher.College}/teachers/{@teacher.Name}");
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadImage();
+    }
+    private async Task LoadImage()
+    {
+        try
+        {
+            var uri = $@"/images/{teacher.Name}.jpg";
+            var img = await Http.GetStreamAsync(uri);
+            teacher.Img = $"images/{teacher.Name}.jpg";
+        }
+        catch(Exception)
+        {
+            teacher.Img = "images/unknown.jpg";
+        } 
+    }
+}

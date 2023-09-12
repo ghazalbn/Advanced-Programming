@@ -1,0 +1,93 @@
+@inject NavigationManager Nav
+@inject HttpClient Http
+
+<!-----start modal------>
+    <div class="modal fade" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <div class="row justify-content-center">
+                        <button type="button" class="close" data-dismiss="modal" @onclick="Rate">&times;</button>
+                        <div class="d-block">
+                            <h1>ارزیابی</h1>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            @if(rated)
+                            {
+                                Task.Delay(10000);
+                                <div class="alert alert-danger" role="alert">
+                                    شما قبلا این استاد را ارزیابی کرده اید!
+                                </div>
+                            }
+                            else if(submited)
+                            {
+                                <div class="alert alert-info" role="alert">
+                                    ارزیابی شما برای این استاد ثبت شد:)
+                                </div>
+                            }
+                            else{
+                                <div class="col-lg-9 order-lg-1 col-sm-12 text-right">
+                                    <div class="card mb-2 small-h3">
+                                        <div class="card-header">
+                                            <div class="row justify-content-center" style="font-size: large; margin-top:45px;">
+                                                @Prof.Name
+                                            </div>
+                                            <div class="row justify-content-center">
+                                                <img class="img-thumbnail teacher-image" src=@Prof.Img alt="name">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 card-body">
+                                            <form>
+                                                <input type="hidden" name="_token" value="CnVSykFla77jfUB14BeA4a14HhDWQpGSJz5QKm2c">
+                                                <VoteComponent title="اخلاق" name="akhlagh" OnClick=@Behavior/>
+                                                <VoteComponent title="تدریس" name="tadris" OnClick=@Teaching/>
+                                                <VoteComponent title="نمره" name="nomre" OnClick=@Score items="کمتر از نمره خودم-نمره خودم-بهتر از نمره خودم"/>
+                                                <VoteComponent title="امتحان" name="emtehan" OnClick=@Exam items="سخت-متوسط-آسان"/>
+                                                <VoteComponent title="حضور و غیاب" name="hozurghiab" OnClick=@Attendance items="هرجلسه-اغلب-به ندرت"/>
+
+                                                <div class="row justify-content-center mt-4">
+                                                    <input class="btn w-25" style="background-color: #1bbc9b;" @onclick="Submit" type="submit" value="ثبت">
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="Rate">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-----end modal------>
+
+    @code{
+        [Parameter]
+        public Teacher Prof {get; set;}
+        private Rate rate = new Rate();
+        private bool submited = false, rated = false;
+        private async Task Submit()
+        {
+            System.Console.WriteLine(rate.Score);
+            var uri = $"https://localhost:5003/teacher/{Prof.Id}/rate";
+            await Http.PutAsJsonAsync<Rate>(uri, rate);
+            submited = true;
+        }
+        private void Rate() => rated = submited;
+        private Action<int> Behavior => (b) => rate.Behavior = b;
+        private Action<int> Teaching => (b) => rate.Teaching = b;
+        private Action<int> Exam => (b) => rate.Exam = b;
+        private Action<int> Score => (b) => rate.Score = b;
+        private Action<int> Attendance => (b) => rate.Attendance = b;
+    }

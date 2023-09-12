@@ -1,0 +1,45 @@
+﻿@using System.Net.Http
+@using Radzen
+@using Radzen.Blazor
+<div class="container" style="margin: 150px;">
+    <div class="row">
+        <div class="col-2"></div>
+        <div class="col-md-8 col-sm-12 p-4">
+            <RadzenTabs>
+                <Tabs>
+                    <RadzenTabsItem Text="LatestCountry">
+                        <LatestCountry></LatestCountry>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="DailyReport">
+                        <DailyReport></DailyReport>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </div>
+    </div>
+</div>
+
+@page "/"
+@code{
+    @* private async Task two()
+        => await CallAPI<>("https://covid-19-data.p.rapidapi.com/help/countries"); *@
+    
+    internal static async Task<T> CallAPI<T>(string uri, HttpClient Http)
+    {
+        var httpreq = new HttpRequestMessage(HttpMethod.Get, uri)
+        { 
+            Headers = 
+            {
+                {"x-rapidapi-host", "covid-19-data.p.rapidapi.com"},
+                {"x-rapidapi-key", "4fe241e931msh96ee856ba49f25cp11d5f8jsnf08bd91767e1"}
+            }
+        };
+        HttpResponseMessage response = null;
+        try
+        {
+            response = await Http.SendAsync(httpreq);
+        }
+        catch{}
+        return (await response.Content.ReadFromJsonAsync<T[]>())[0];
+    }
+}

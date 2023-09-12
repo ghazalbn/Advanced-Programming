@@ -1,0 +1,25 @@
+<div class="row align-items-center my-2">
+    <h3 class="col-sm-3">@title:</h3>
+    <div class="col-sm-9">
+        <div class="progress">
+            @if(rate < 30){
+                <div class="progress-bar bg-danger" style="width:@rate%">@rate% @stage</div>
+            }
+            else if(rate < 60){
+                <div class="progress-bar bg-warning" style="width:@rate%">@rate% @stage</div>
+            }
+            else{
+                <div class="progress-bar bg-success" style="width:@rate%">@rate% @stage</div>
+            }
+        </div>
+    </div>
+</div>
+
+@code{
+    [Parameter]
+    public string title{get; set;}
+    [Parameter]
+    public int rate{get; set;} = 0;
+    [Parameter]
+    public string stage{get; set;}
+}

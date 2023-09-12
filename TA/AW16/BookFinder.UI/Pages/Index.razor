@@ -1,0 +1,124 @@
+﻿@page "/"
+@inject Book book;
+@inject Form form;
+
+<div class="container">
+    <div class="row" style="margin-top: 45px;"></div>
+    <div class="row">
+        <div class="col-4"></div>
+        <span class="col">
+            <EditForm Model="form" OnValidSubmit="ShowBook">
+                <DataAnnotationsValidator />
+                <span class="form-group">
+                    <label for="Search">Book:</label>
+                    <InputText style="margin-top: 10px;" type="text" class="form-control" id="Search" @bind-Value="form.BookName"/>
+                </span>
+                <button type="submit" style="width: 60px; height: 40px; margin-top: 20px;" class="btn btn-warning">
+                    <span class="oi oi-magnifying-glass"></span>
+                </button>
+                <ValidationSummary style="margin-top: 20px;"/>
+            </EditForm>
+        </span>
+        <div class="col-4"></div>
+    </div>
+    <div class="row">
+        @if(ShowB) 
+        {
+            <div class="col-4">
+                <div class="card" style="width: 18rem;">
+                    <img src=@image_path class="card-img-top" height="300px">
+                    <div class="card-body">
+                        <h5 class="card-title">@Name</h5>
+                        <p class="card-text">@Words</p>
+                        <p class="card-text">....</p>
+                        <a @onclick="() => ShowT = true" class="btn btn-info">Show Chart</a>
+                    </div>
+                </div>
+            </div>
+        }
+        @if(table != null && ShowT)
+        {
+            <div class="col-md-8 col-sm-12 p-4" style="margin-top: 80px;">
+                <RadzenTabs>
+                    <Tabs>
+                        <RadzenTabsItem Text="Chart">
+                            <MyChart Data="@words"></MyChart>
+                        </RadzenTabsItem>
+                        <RadzenTabsItem Text="Table">
+                            <MyTable Items="@table"></MyTable>
+                        </RadzenTabsItem>
+                    </Tabs>
+                </RadzenTabs>
+            </div>
+        }
+    </div>
+        @if(msg != null)
+        {
+            <div class="row" style="margin-top: 80px;">
+                <div class=" col-3"/>
+                <div class="col">
+                    <div class="alert alert-secondary" role="alert">@msg</div>
+                </div>
+                <div class="col-3"/>
+            </div>
+        }
+</div>
+
+
+@code{
+    private string Name, image_path, Words, msg;
+    private bool ShowT, ShowB = false;
+    private Words[] words;
+    private Text[] table;
+    private async Task ShowBook()
+    {
+        (table, ShowT, ShowB) = (null, false, false);
+        book.BookInit(form.BookName);
+        if(book.Name == null)
+            msg = $"The Book «{form.BookName}» Is Not Found!";
+        else
+        {
+            await Task.Run(() => 
+            {msg = null;
+            Name = book.Name;
+            Words = book.words();
+            image_path = $"images\\{Name}.jpg";
+            ShowB = true;
+            initWords();
+            });
+        }
+    }
+    private async Task initWords()
+    {
+        long all =0, positive =0, negative =0;
+        words = new Words[book.Text.Length/1000 + 1];
+        await Task.Run(() => {
+            for (int i = 0; i < words.Length; i++)
+            {
+                string str = book.Text.Skip(i*1000).Take(1000)
+                .Aggregate((s1,s2) => $"{s1} {s2}");
+                (long a,long p,long n) = book.posNegWords(str);
+                all += a; positive += p; negative += n;
+                words[i] = new Words
+                {
+                    count = (i+1)*1000,
+                    ratio = Math.Round((double)p/n, 3)
+                };
+            }
+        initTable(all, positive, negative);
+        });
+    }
+    public void initTable(long a, long p, long n)
+    {
+        table = new Text[]
+        {
+            new Text
+            {
+                AllWords = a,
+                PositiveWords = p,
+                NegativeWords = n,
+                Ratio = Math.Round(((double)p/n), 3)
+            }
+        };
+    }
+}

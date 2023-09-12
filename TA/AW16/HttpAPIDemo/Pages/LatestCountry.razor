@@ -1,0 +1,44 @@
+@page "/LatestCountry"
+
+<div class="container">
+    <div class="row">
+        <label for="Date">Country: </label>
+        <input type="text" name="Country" @bind="Name">
+        <div class="col">
+            <button type="button" class="btn btn-danger" @onclick="CallLatestCountry">CallLatestCountry</button>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 60px;"></div>
+    @if(latestCountry != null)
+    {
+        @foreach (var line in latestCountry.Information())
+        {
+            <div class="row">
+                <p>@line</p>
+            </div>
+        }
+    }
+    else if(msg != null)
+    {
+        <p>@msg</p>
+    }
+</div>
+@code{
+    public string Name;
+    private string msg;
+    private LatestCounties latestCountry;
+    private async Task CallLatestCountry()
+    {
+        msg = null;
+        try
+        {
+            latestCountry = await Index.CallAPI<LatestCounties>
+            ($"https://covid-19-data.p.rapidapi.com/country?format=json&name={Name.ToLower()}", Http);
+        }
+        catch
+        {
+            msg = $"There's no information about {Name}!";
+            latestCountry = null;
+        }
+    }
+}

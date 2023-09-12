@@ -1,0 +1,32 @@
+@if(enumerable == 0)
+{
+    <li class="page-item disabled" style=@style><span class="page-link">« صفحه قبل</span></li>
+}
+else
+{
+    <li class="page-item" style=@style><a class="page-link" type="button" style="background-color: #8dcfc2; color: white;" @onclick=@OnPrev rel="prev">« صفحه قبل</a></li>
+}
+@if(enumerable == (int)max/count  || enumerable == (int)max/count - 1)
+{
+    <li class="page-item disabled"><span class="page-link">صفحه بعد »</span></li>
+}
+else
+{
+    <li class="page-item"><a class="page-link" type="button" @onclick=@OnNext rel="next" style="background-color: #8dcfc2; color: white;">صفحه بعد »</a></li>
+}
+  
+
+@code{
+    [Parameter]
+    public int enumerable {get; set;}
+    [Parameter]
+    public string style { get; set; }
+    [Parameter]
+    public int max {get; set;}
+    [Parameter]
+    public int count {get; set;}
+    [Parameter]
+    public Action OnPrev {get; set;}
+    [Parameter]
+    public Action OnNext {get; set;}
+}

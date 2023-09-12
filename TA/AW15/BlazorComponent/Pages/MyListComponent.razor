@@ -1,0 +1,11 @@
+@page "/MyList"
+<ul class="List-group">
+    @foreach (var item in Items)
+    {
+        <li class="List-group-item">@item</li>
+    }
+</ul>
+@code{
+    [Parameter]
+    public IEnumerable<string> Items{get; set;} = new[]{"Defult"};
+}

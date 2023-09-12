@@ -1,0 +1,42 @@
+@page "/{School}/booklets"
+@inject HttpClient Http
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6" style="margin-top: 6%">
+            <div id="accordion" class="accordion">
+                @for (int j = 6*enumerable; j < 6*(enumerable+1); j++)
+                {
+                    string id = $"i{j}";
+                    @if (j == Lessons.Length)
+                    {
+                        break;
+                    }
+                    <CollapseComponent id=@id lesson=@Lessons[j]/>
+                }    
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center mt-2 mb-5">
+        <ul class="pagination p-0">   
+            <PagesComponent count=6 enumerable="@enumerable" OnNext="() => enumerable++" OnPrev="() => enumerable--" max="@Lessons.Length"/>
+        </ul>
+    </div> 
+</div>
+<FooterComponent Href="/{School}/booklets/#"/>
+
+@code{
+    [Parameter]
+    public string School {get; set;}
+    protected override void OnParametersSet()
+    {
+        var t = School;
+    }
+    private int enumerable {get; set;} = 0;
+    private string[] Lessons = {};
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = $@"https://localhost:5003/booklet/{School}/lessons";
+        Lessons = await Http.GetFromJsonAsync<string[]>(uri); 
+    }
+}

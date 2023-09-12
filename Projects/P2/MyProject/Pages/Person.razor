@@ -1,0 +1,127 @@
+@page "/{School}/teachers/{Name}"
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+@* <div class="back-g1"> *@
+<div class="container">
+    <ModalComponent Prof=@Teacher/>
+
+    <div class="row" style="margin: 100px 100px 0 0;">
+        <div class="col-3.5" style="margin-right: 100px;">
+            <div class="card" style="width:300px; height: 300px; border-radius: 0 0 8% 0;">
+                <img class="card-img-top" style="height: 170px;" src="@Teacher.Img" alt="Card image">
+                <div class="card-body">
+                    <h4 class="card-title">@Teacher.Name</h4>
+                    <p class="card-text">@Teacher.TotalRate%</p>
+                    <div class="star-ratings-sprite">
+                        <span style="width:@Teacher.TotalRate%;" class="star-ratings-sprite-rating"></span>
+                    </div>
+                    <div class="row justify-content-center mt-4">
+                        <button type="button" class="btn" style="background-color: #1bbc9b; color: white;" data-toggle="modal" data-target="#myModal">
+                            این استاد را ارزیابی کنید
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 order-lg-1 col-sm-12 text-right">
+            <div class="card mb-2 small-h3" style="height: 300px; border-radius: 13% 0 0 13%;">
+                <h2 class="card-header">خصوصیات</h2>
+                <div class="col-12 card-body">
+                    <ProgressBarComponent title="اخلاق" rate=@Teacher.BehaviorRate stage=@Teacher.BehaviorStage/>
+                    <ProgressBarComponent title="تدریس" rate=@Teacher.TeachingRate stage=@Teacher.TeachingStage/>
+                    <ProgressBarComponent title="نمره" rate=@Teacher.ScoreRate stage=@Teacher.ScoreStage/>
+                    <ProgressBarComponent title="امتحان" rate=@Teacher.ExamRate stage=@Teacher.ExamStage/>
+                    <hr>
+                    <div class="row my-2">
+                        <h3 class="col-sm-3 col-6">حضور و غیاب:</h3>
+                        <div class="col-sm-9 col-6">@Teacher.AttendanceStage</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8 order-lg-1 col-sm-12 text-right" style="margin-right: 185px;">
+        <div class="card mb-2" style="width: 865px;">
+            <h2 class="card-header">نظرات</h2>
+            <form id="commentform" onsubmit="return validateForm()">
+                <div class="col-sm-12">
+                    <textarea name="comment" style="padding: 20px 30px;" @bind="comment" placeholder="نظر شما درباره این استاد چیست؟" rows="4" tabindex="4" class="form-control"></textarea>
+                </div>
+                <p>
+                    <input @onclick="@AddComment" class="btn" style="background-color: #1bbc9b; color: white; margin-top: 10px;" type="submit" tabindex="5" value="ارسال نظر">
+                </p>
+            </form>
+            <div class="card-body small-h3">
+                @foreach (var comment in Comments)
+                {
+                    <hr>
+                    <div class="row" style="margin: 20px 20px -10px 20px; padding: 25px; background-color: white;">
+                        <p class="text-justify mb-2">@comment.Text</p>
+                    </div>
+                }    
+            </div>
+        </div>
+    </div>
+</div>
+@* </div> *@
+<FooterComponent Href="/{School}/teachers/{Name}/#"/>
+
+@code{
+    [Parameter]
+    public string Name {get; set;}
+    [Parameter]
+    public string School {get; set;}
+    protected override void OnParametersSet()
+    {
+        var t = Name;
+        var s = School;
+    }
+    private Teacher Teacher = new Teacher();
+    private Comment[] Comments = {};
+    private string comment;
+    private bool validateForm() 
+    {
+        if (comment == "" || comment == null) 
+            return false;
+        return true;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await FindTeacher();
+        await LoadImage();
+        await LoadComments();     
+    }
+    private async Task LoadComments()
+    {
+        var uri = $@"https://localhost:5003/comment/{Teacher.Id}/comments";
+        Comments = await Http.GetFromJsonAsync<Comment[]>(uri);
+    }
+    private async Task LoadImage()
+    {
+        try
+        {
+            var uri = $@"/images/{Teacher.Name}.jpg";
+            var img = await Http.GetStreamAsync(uri);
+            Teacher.Img = $"images/{Teacher.Name}.jpg";
+        }
+        catch(Exception)
+        {
+            Teacher.Img = "images/unknown.jpg";
+        }
+    }
+    private async Task FindTeacher()
+    {
+        var uri = $@"https://localhost:5003/teacher/{School}/{Name}";
+        Teacher = await Http.GetFromJsonAsync<Teacher>(uri);
+    }
+    private async Task AddComment()
+    {
+        if(comment != null)
+        {
+            var uri = $"https://localhost:5003/comment/{Teacher.Id}/add";
+            await Http.PostAsJsonAsync<Comment>(uri, new Comment(Teacher.Id, comment));
+            Nav.NavigateTo("/{School}/teachers/{Name}/#");
+        }
+    }
+}

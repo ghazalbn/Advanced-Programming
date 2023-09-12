@@ -1,0 +1,11 @@
+﻿@page "/"
+
+<div class="container">
+    <div class="row" style="margin-top: 100px;">
+        <MyListComponent items = "@this.Items"></MyListComponent>
+    </div>
+</div>
+@code{
+    private IEnumerable<string> Items = new[]{
+        "Item1", "Item2", "Item3"};
+}

@@ -1,0 +1,127 @@
+﻿@page "/"
+
+@* <div style="background-image: url('images\back.jpg');"></div> *@
+<div class="container">
+    <div class="row" style="margin-top: 45px;"></div>
+    <div class="row">
+        <div class="col-4"></div>
+        <span class="col">
+            <input type="string" @bind="Input" style="background-color: aliceblue; width: 250px; height: 35px;">
+            <button @onclick="ShowBook"  type="button" class="btn btn-warning">
+                <span class="oi oi-magnifying-glass"></span>
+            </button>
+        </span>
+    </div>
+    <div class="row">
+        @if(Name != null && msg == null) 
+        {
+            <div class="col-4">
+                <div class="card" style="width: 18rem;">
+                    <img src=@image_path class="card-img-top" height="300px">
+                    <div class="card-body">
+                        <h5 class="card-title">@Name</h5>
+                        <p class="card-text">@Words</p>
+                        <p class="card-text">....</p>
+                        <a @onclick="initWords" class="btn btn-info">Show Chart</a>
+                    </div>
+                </div>
+            </div>
+        }
+        @if(table != null)
+        {
+            <div class="col-md-8 col-sm-12 p-4" style="margin-top: 30px;">
+                <RadzenChart>
+                    <RadzenLineSeries Data="@words" CategoryProperty="count" Title="positive/negative" ValueProperty="ratio">
+                        <RadzenMarkers MarkerType="MarkerType.Circle" />
+                    </RadzenLineSeries>
+                    <RadzenCategoryAxis Padding="20" Formatter="@FormatValue"/>
+                    <RadzenValueAxis Formatter="@FormatValue">
+                        <RadzenGridLines Visible="true" />
+                        <RadzenAxisTitle Text="The Ratio of Positive words to Negative words" />
+                    </RadzenValueAxis>
+                </RadzenChart>
+
+                <RadzenGrid style="margin-top: 70px;" ColumnWidth="150px" TItem="Text" Data="@table" PageSize="1">
+                    <Columns>
+                        <RadzenGridColumn TItem="Text" Property="AllWords" Title="All Words"/>
+                        <RadzenGridColumn TItem="Text" Property="PositiveWords" Title="Positive Words"/>
+                        <RadzenGridColumn TItem="Text" Property="NegativeWords" Title="Negative Words"/>
+                        <RadzenGridColumn TItem="Text" Property="Ratio" Title="Ratio"/>
+                    </Columns>
+                </RadzenGrid>
+            </div>  
+        }
+    </div>
+        @if(msg != null)
+        {
+            <div class="row" style="margin-top: 80px;">
+                <div class=" col-3"/>
+                <div class="col">
+                    <div class="alert alert-secondary" role="alert">@msg</div>
+                </div>
+                <div class="col-3"/>
+            </div>
+        }
+</div>
+
+
+@code{
+    private string Name,Input, image_path, Words, msg;
+    private Book book;
+    private Words[] words;
+    private Text[] table;
+    private void ShowBook()
+    {
+        table = null;
+        if(Input == null || Input.Length < 1)
+            msg = $"Please enter a book's name!";
+        else
+        {
+            book = new Book(Input);
+            if(book.Text == null)
+                msg = $"The Book «{Input}» Not Found!";
+            else
+            {
+                Name = book.Name;
+                Words = book.words();
+                image_path = $"images\\{Name}.jpg";
+                msg = null;
+            }
+        }
+    }
+    string FormatValue(object value)
+        => Math.Round((double)value, 3).ToString();
+    private void initWords()
+    {
+        (long a, long p, long n) = book.wordCount;
+        table = new Text[]
+        {
+            new Text
+            {
+                AllWords = a,
+                PositiveWords = p,
+                NegativeWords = n,
+                Ratio = Math.Round(((double)p/n), 3)
+            }
+        };
+        words = new Words[book.Text.Length/1000 + 1];
+        int j = 1000;
+        for (int i = 0; i < words.Length; i++)
+        {
+            string[] str = new string[1000];
+            for (int k = 0; k < 1000; k++)
+            {
+                if(i*1000 + k  == book.Text.Length)
+                    break;
+                str[k] = book.Text[(i*1000)+k];
+            }
+            (a, p, n) = book.posNegWords(str);
+            words[i] = new Words
+            {
+                count = j,
+                ratio = Math.Round((double)p/n, 3)
+            };
+            j += 1000;
+        }
+    }
+}

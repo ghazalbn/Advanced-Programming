@@ -1,0 +1,45 @@
+@page "/DailyReport"
+
+<div class="container">
+    <div class="row">
+        <label for="Date">Date: </label>
+        <input type="date" name="Date" @bind="Date">
+        <div class="col">
+            <button type="button" class="btn btn-info" @onclick="CallDailyReport">CallDailyReport</button>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 60px;"></div>
+    @if(dailyReport != null)
+    {
+        @foreach (var line in dailyReport.Information())
+        {
+            <div class="row">
+                <p>@line</p>
+            </div>
+        }
+    }
+    else if(msg != null)
+    {
+        <p>@msg</p>
+    }
+</div>
+@code{
+    public DateTime Date;
+    private string msg;
+    private DailyReports dailyReport;
+    private async Task CallDailyReport()
+    {
+        msg = null;
+        var date = Date.ToShortDateString().Replace('/', '-');
+        try
+        {
+            dailyReport = await Index.CallAPI<DailyReports>
+            ($"https://covid-19-data.p.rapidapi.com/report/totals?date-format=DD-MM-YYYY&format=json&date={date}", Http);
+        }
+        catch
+        {
+            msg = "There's no information about this date!";
+            dailyReport = null;
+        };
+    }
+}

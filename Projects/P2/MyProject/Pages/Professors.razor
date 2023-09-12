@@ -1,0 +1,39 @@
+@page "/{School}/teachers"
+@inject HttpClient Http
+
+<div class="col-lg-6 col-sm-12 order-sm-0 order-lg-1" style="background-color: #1bbc9b; margin: 100px 305px 0 0; border-radius: 5%;">
+    <div class="card" >
+        <div class="card-body">
+            @for (int j = 6*enumerable; j < 6*(enumerable+1); j++)
+            {
+                @if (j == Teachers.Length)
+                {
+                    break;
+                }
+                <ProfComponent teacher="@Teachers[j]"/>
+            }   
+        </div>
+    </div>
+    <div class="row justify-content-center mt-2 mb-5">
+        <ul class="pagination p-0">   
+            <PagesComponent count=6 enumerable="@enumerable" OnNext="() => enumerable++" OnPrev="() => enumerable--" max="@Teachers.Length"/>
+        </ul>
+    </div> 
+</div>
+<FooterComponent Href="/{School}/teachers/#"/>
+
+@code{
+    [Parameter]
+    public string School {get; set;}
+    protected override void OnParametersSet()
+    {
+        var t = School;
+    }
+    private int enumerable {get; set;} = 0;
+    private Teacher[] Teachers = {};
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = $@"https://localhost:5003/teacher/{School}/teachers";
+        Teachers = await Http.GetFromJsonAsync<Teacher[]>(uri);   
+    }
+}

@@ -1,0 +1,24 @@
+@using System.Linq;
+@page "/MyTable"
+<RadzenGrid style="margin-top: 70px;" ColumnWidth="150px" TItem="Text" Data="@Items" PageSize="1">
+    <Columns>
+        @foreach (Text item in Items)
+        {
+            <RadzenGridColumn TItem="Text" Property="AllWords" Title="All Words"/>
+            <RadzenGridColumn TItem="Text" Property="PositiveWords" Title="Positive Words"/>
+            <RadzenGridColumn TItem="Text" Property="NegativeWords" Title="Negative Words"/>
+            <RadzenGridColumn TItem="Text" Property="Ratio" Title="Ratio"/>
+        }
+    </Columns>
+</RadzenGrid>
+@code{
+    [Parameter]
+    public Text[] Items{get; set;} = new[]{
+    new Text
+    {
+        AllWords = 10,
+        PositiveWords = 3,
+        NegativeWords = 4,
+        Ratio = Math.Round(((double)3/4), 3)
+    }};
+}

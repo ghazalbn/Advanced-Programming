@@ -1,0 +1,55 @@
+﻿@page "/"
+@* <div style="background-image: url('images\back.jpg');"></div> *@
+<div class="container">
+    <div class="row" style="margin-top: 45px;"></div>
+    <div class="row">
+        <span class="col-6">
+            <input type="string" @bind="Name" style="background-color: aliceblue; width: 250px; height: 35px;">
+            <button @onclick="ShowWords"  type="button" class="btn btn-warning">
+                <span class="oi oi-magnifying-glass"></span>
+            </button>
+        </span>
+    
+        <div class="col">
+            @if(@msg != null)
+            {
+                <div class="alert alert-secondary" role="alert">@msg</div>
+            }
+            else if(@Name != null) 
+            {
+                <div class="card" style="width: 18rem;">
+                    <img src=@image_path class="card-img-top" height="300px">
+                    <div class="card-body">
+                        <h5 class="card-title">@Name</h5>
+                        <p class="card-text">@Words</p>
+                        <a href="#" class="btn btn-info">Show</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@code{
+    private string Name, image_path, Words, msg;
+    private void ShowWords()
+    {
+        if(Name == null || Name.Length < 1)
+            msg = $"Please enter a book's name!";
+         
+        else 
+        {
+            Book book = new Book(Name);
+            if(book.Text != null)
+            {
+                Name = book.Name;
+                Words = book.words();
+                image_path = $"images\\{Name}.jpg";
+                msg = null;
+            }
+            else
+                msg = $"The Book {@Name} Not Found!";
+        }
+    }
+}

@@ -1,0 +1,21 @@
+@inject NavigationManager Nav
+
+<li style="margin-bottom: -40px; margin-left: -40px;">
+    <div class="ch-item" style="border-radius: 30%; width: 70%; height: 70%; background: url(/images/@img) no-repeat;">
+        <div class="ch-info">
+            <a class="popup-with-zoom-anim" type="button" @onclick=@OnClick>
+                <h4>@text</h4>
+            </a>
+        </div>
+    </div>
+</li>
+
+@code{
+    [Parameter]
+    public string href{get; set;}
+    [Parameter]
+    public string text{get; set;}
+    private string img => $"{text.Replace(" مهندسی","")}.jpg";
+    private Action OnClick => () => Nav.NavigateTo ($"/{text}/{href}");
+
+}

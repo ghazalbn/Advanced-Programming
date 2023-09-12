@@ -1,0 +1,35 @@
+<div class="row mb-3">
+    <h3 class="col-sm-3" style="margin-right: 10px;">@title:</h3>
+    <div class="col-sm-9 row justify-content-around" style="margin-right: -50px;">
+        @for(int i = 0; i < _items.Length ; i++)
+        {   
+            int id = i + 1;
+            Action Click =  () => @OnClick(id);
+            <div class="col-sm-3.5">
+                <label for=i>@_items[i]</label>
+                @if(i < _items.Length/2)
+                {
+                    <input name=@name type="radio" value=id id=id checked="" @onclick=Click>
+                }
+                else
+                {
+                    <input name=@name type="radio" value=id id=id @onclick=Click>   
+                }
+            </div>
+        }
+    </div>
+</div>
+<hr><hr>
+
+@code{
+    [Parameter]
+    public string items {get; set;} = "ضعیف-متوسط-خوب-عالی";
+    [Parameter]
+    public string name {get; set;}
+    [Parameter]
+    public string title {get; set;}
+    [Parameter]
+    public Action<int> OnClick { get; set; }
+    private string[] _items {get => items.Split('-');}
+
+}

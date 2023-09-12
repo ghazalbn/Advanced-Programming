@@ -1,0 +1,32 @@
+﻿@page "/"
+<div class="container">
+    <div class="row" style="margin-top: 100px;">
+        <EditForm Model="model" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+        <div class="form-group">
+            <label for="exampleInputEmail1">Email address</label>
+            <InputText type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" @bind-Value="model.Email"/>
+            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword1">Password</label>
+            <InputText type="password" class="form-control" id="exampleInputPassword1" @bind-Value="model.Password"/>
+        </div>
+        <div class="form-group form-check">
+            <InputCheckbox type="checkbox" class="form-check-input" id="exampleCheck1" @bind-Value="model.IsValidatedDesign"/>
+            <label class="form-check-label" for="exampleCheck1">Check me out</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <ValidationSummary style="margin-top: 20px;"/>
+        </EditForm>             
+    </div>
+</div>
+
+@code {
+    private Model model = new Model();
+
+    private void HandleValidSubmit()
+    {
+        Console.WriteLine("OnValidSubmit");
+    }
+}
